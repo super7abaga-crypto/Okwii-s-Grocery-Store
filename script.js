@@ -156,6 +156,42 @@ function searchProducts() {
    CART
 ========================= */
 
+
+function showCartToast(productName) {
+    let toast = document.getElementById("cart-toast");
+
+    // Create the notification the first time it is needed.
+    if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "cart-toast";
+        toast.className = "cart-toast";
+
+        toast.innerHTML = `
+            <span class="cart-toast-icon">✓</span>
+            <div class="cart-toast-message">
+                <strong>Added to your cart</strong>
+                <span id="cart-toast-text"></span>
+            </div>
+        `;
+
+        document.body.appendChild(toast);
+    }
+
+    document.getElementById("cart-toast-text").textContent =
+        productName + " has been added successfully.";
+
+    // Make the notification slide into view.
+    toast.classList.add("show");
+
+    // Clear the previous timer if another product is added.
+    clearTimeout(window.cartToastTimer);
+
+    // Hide the notification after 2.5 seconds.
+    window.cartToastTimer = setTimeout(() => {
+        toast.classList.remove("show");
+    }, 2500);
+}
+
 function addToCart(productId) {
 
     const product =
@@ -167,7 +203,7 @@ function addToCart(productId) {
 
     updateCart();
 
-    alert(`${product.name} added to your cart.`);
+    showCartToast(product.name);
 }
 
 
