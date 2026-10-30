@@ -461,3 +461,53 @@ footer {
     color: #666666;
     font-size: 13px;
 }
+
+/* CUSTOMER AUTHENTICATION */
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.account-button {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: #f0f0f0;
+    color: #222;
+    font-weight: bold;
+}
+
+.account-button:hover {
+    background: #ddd;
+}
+
+.auth-box {
+    width: 90%;
+    max-width: 420px;
+}
+
+.auth-box input {
+    display: block;
+    width: 100%;
+    padding: 13px;
+    margin: 12px 0;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+.auth-box form button {
+    width: 100%;
+}
+
+.auth-box p {
+    margin-top: 15px;
+}
+
+#auth-message {
+    font-weight: bold;
+    text-align: center;
+}

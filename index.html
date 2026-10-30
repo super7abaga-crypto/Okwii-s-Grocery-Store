@@ -25,10 +25,40 @@
             <a href="#contact">Contact</a>
         </nav>
 
-        <button class="cart-button" onclick="openCart()">
-            🛒 Cart (<span id="cart-count">0</span>)
-        </button>
+<div class="nav-actions">
 
+    <button
+        class="account-button"
+        id="login-button"
+        onclick="openAuth('login')"
+    >
+        Login
+    </button>
+
+    <button
+        class="account-button"
+        id="register-button"
+        onclick="openAuth('register')"
+    >
+        Register
+    </button>
+
+    <span id="customer-name" style="display: none;"></span>
+
+    <button
+        class="account-button"
+        id="logout-button"
+        onclick="logoutCustomer()"
+        style="display: none;"
+    >
+        Logout
+    </button>
+
+    <button class="cart-button" onclick="openCart()">
+        🛒 Cart (<span id="cart-count">0</span>)
+    </button>
+
+</div>
     </header>
 
 
@@ -169,6 +199,110 @@
 
     </div>
 
+<!-- CUSTOMER AUTHENTICATION -->
+<div id="auth-modal" class="modal">
+
+    <div class="cart-box auth-box">
+
+        <button
+            class="close-button"
+            onclick="closeAuth()"
+            aria-label="Close authentication"
+        >
+            ×
+        </button>
+
+        <!-- LOGIN FORM -->
+        <div id="login-form">
+
+            <h2>Welcome Back!</h2>
+
+            <p>Log in to your OGS account.</p>
+
+            <form onsubmit="loginCustomer(event)">
+
+                <input
+                    type="email"
+                    id="login-email"
+                    placeholder="Email address"
+                    required
+                >
+
+                <input
+                    type="password"
+                    id="login-password"
+                    placeholder="Password"
+                    required
+                >
+
+                <button type="submit" class="checkout-button">
+                    Login
+                </button>
+
+            </form>
+
+            <p>
+                Don't have an account?
+                <button onclick="openAuth('register')">
+                    Register
+                </button>
+            </p>
+
+        </div>
+
+
+        <!-- REGISTRATION FORM -->
+        <div id="register-form" style="display: none;">
+
+            <h2>Create Your Account</h2>
+
+            <p>Join Okwii's Grocery Store today.</p>
+
+            <form onsubmit="registerCustomer(event)">
+
+                <input
+                    type="text"
+                    id="register-name"
+                    placeholder="Full name"
+                    minlength="2"
+                    required
+                >
+
+                <input
+                    type="email"
+                    id="register-email"
+                    placeholder="Email address"
+                    required
+                >
+
+                <input
+                    type="password"
+                    id="register-password"
+                    placeholder="Password (minimum 8 characters)"
+                    minlength="8"
+                    required
+                >
+
+                <button type="submit" class="checkout-button">
+                    Create Account
+                </button>
+
+            </form>
+
+            <p>
+                Already have an account?
+                <button onclick="openAuth('login')">
+                    Login
+                </button>
+            </p>
+
+        </div>
+
+        <p id="auth-message"></p>
+
+    </div>
+
+</div>
 
     <!-- FOOTER -->
     <footer id="contact">

@@ -1,59 +1,33 @@
-const products = [
-    {
-        id: 1,
-        name: "Premium Rice",
-        category: "food",
-        price: 45000,
-        description: "Quality Nigerian rice for everyday meals.",
-        image: "images/rice.jpg"
-    },
+let products = [];
+async function loadProducts() {
 
-    {
-        id: 2,
-        name: "Cooking Oil",
-        category: "food",
-        price: 12000,
-        description: "Premium vegetable cooking oil.",
-        image: "images/oil.jpg"
-    },
+    const container =
+        document.getElementById("product-container");
 
-    {
-        id: 3,
-        name: "Soft Drink",
-        category: "drinks",
-        price: 800,
-        description: "Refreshing chilled soft drink.",
-        image: "images/drink.jpg"
-    },
+    container.innerHTML = "<p>Loading products...</p>";
 
-    {
-        id: 4,
-        name: "Biscuits",
-        category: "snacks",
-        price: 1000,
-        description: "Crunchy biscuits for a quick snack.",
-        image: "images/biscuits.jpg"
-    },
+    try {
 
-    {
-        id: 5,
-        name: "Spaghetti",
-        category: "food",
-        price: 1500,
-        description: "Quality spaghetti for delicious meals.",
-        image: "images/spaghetti.jpg"
-    },
+        const response = await fetch(
+            "http://127.0.0.1:8000/products"
+        );
 
-    {
-        id: 6,
-        name: "Laundry Detergent",
-        category: "household",
-        price: 3500,
-        description: "Effective detergent for clean clothes.",
-        image: "images/detergent.jpg"
+        if (!response.ok) {
+            throw new Error("Unable to load products.");
+        }
+
+        products = await response.json();
+
+        displayProducts(products);
+
+    } catch (error) {
+
+        console.error("Product loading error:", error);
+
+        container.innerHTML =
+            "<p>Unable to load products. Please try again.</p>";
     }
-];
-
+}
 
 let cart = [];
 
@@ -77,7 +51,7 @@ function displayProducts(productList) {
 
         card.innerHTML = `
             <img
-                src="${product.image}"
+                src="images/${product.image}"
                 alt="${product.name}"
                 onerror="this.src='https://via.placeholder.com/400x300?text=${encodeURIComponent(product.name)}'"
             >
@@ -299,4 +273,182 @@ function closeCart() {
    START WEBSITE
 ========================= */
 
-displayProducts(products);
+loadProducts();
+// ================================
+// CUSTOMER AUTHENTICATION
+// ================================
+
+const API_URL = "http://127.0.0.1:8000";
+
+function openAuth(formType) {
+    const modal = document.getElementById("auth-modal");
+
+    document.getElementById("login-form").style.display =
+        formType === "login" ? "block" : "none";
+
+    document.getElementById("register-form").style.display =
+        formType === "register" ? "block" : "none";
+
+    document.getElementById("auth-message").textContent = "";
+
+    modal.style.display = "flex";
+}
+
+
+function closeAuth() {
+    document.getElementById("auth-modal").style.display = "none";
+}
+
+
+// CUSTOMER REGISTRATION
+
+async function registerCustomer(event) {
+    event.preventDefault();
+
+    const fullName =
+        document.getElementById("register-name").value.trim();
+
+    const email =
+        document.getElementById("register-email").value.trim();
+
+    const password =
+        document.getElementById("register-password").value;
+
+    const message =
+        document.getElementById("auth-message");
+
+    try {
+        const response = await fetch(`${API_URL}/register`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                full_name: fullName,
+                email: email,
+                password: password
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.detail || "Registration failed.");
+        }
+
+        message.textContent = "Account created successfully! You can now log in.";
+
+        message.style.color = "green";
+
+        document.querySelector("#register-form form").reset();
+
+    } catch (error) {
+        message.textContent = error.message;
+        message.style.color = "red";
+    }
+}
+
+
+// CUSTOMER LOGIN
+
+async function loginCustomer(event) {
+    event.preventDefault();
+
+    const email =
+        document.getElementById("login-email").value.trim();
+
+    const password =
+        document.getElementById("login-password").value;
+
+    const message =
+        document.getElementById("auth-message");
+
+    try {
+        const response = await fetch(`${API_URL}/login`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                email: email,
+                password: password
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.detail || "Login failed.");
+        }
+
+        localStorage.setItem("ogs_token", data.access_token);
+
+        localStorage.setItem(
+            "ogs_customer",
+            JSON.stringify(data.customer)
+        );
+
+        message.textContent = "Login successful!";
+        message.style.color = "green";
+
+        updateCustomerNavigation();
+
+        document.querySelector("#login-form form").reset();
+
+        setTimeout(closeAuth, 1000);
+
+    } catch (error) {
+        message.textContent = error.message;
+        message.style.color = "red";
+    }
+}
+
+
+// UPDATE NAVIGATION AFTER LOGIN
+
+function updateCustomerNavigation() {
+    const customerData = localStorage.getItem("ogs_customer");
+
+    if (!customerData) {
+        return;
+    }
+
+    const customer = JSON.parse(customerData);
+
+    document.getElementById("login-button").style.display = "none";
+
+    document.getElementById("register-button").style.display = "none";
+
+    const customerName =
+        document.getElementById("customer-name");
+
+    customerName.textContent = `Welcome, ${customer.full_name}`;
+
+    customerName.style.display = "inline";
+
+    document.getElementById("logout-button").style.display = "inline-block";
+}
+
+
+// CUSTOMER LOGOUT
+
+function logoutCustomer() {
+    localStorage.removeItem("ogs_token");
+
+    localStorage.removeItem("ogs_customer");
+
+    document.getElementById("login-button").style.display = "inline-block";
+
+    document.getElementById("register-button").style.display = "inline-block";
+
+    document.getElementById("customer-name").style.display = "none";
+
+    document.getElementById("logout-button").style.display = "none";
+
+    alert("You have logged out successfully.");
+}
+
+
+// RESTORE CUSTOMER SESSION WHEN WEBSITE OPENS
+
+updateCustomerNavigation();
