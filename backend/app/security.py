@@ -37,3 +37,26 @@ def create_access_token(customer_id: int) -> str:
     }
 
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+
+def decode_access_token(token: str) -> int | None:
+    try:
+        payload = jwt.decode(
+            token,
+            SECRET_KEY,
+            algorithms=[ALGORITHM]
+        )
+
+        customer_id = payload.get("sub")
+
+        if customer_id is None:
+            return None
+
+        customer_id = int(customer_id)
+
+        if customer_id <= 0:
+            return None
+
+        return customer_id
+
+    except (jwt.PyJWTError, ValueError, TypeError):
+        return None
